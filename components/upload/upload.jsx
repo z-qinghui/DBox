@@ -3,6 +3,7 @@ import RcUpload from 'rc-upload';
 import UploadList from './uploadList';
 import getFileItem from './getFileItem';
 import classNames from 'classnames';
+const prefixCls = 'idoll-upload';
 
 function noop() {
 }
@@ -59,8 +60,10 @@ export default class Upload extends React.Component {
   static Dragger = UploadDragger;
 
   static defaultProps = {
-    prefixCls: 'idoll-upload',
+    prefixCls: prefixCls,
     type: 'select',
+    // do not set
+    // name: '',
     multiple: false,
     action: '',
     data: {},
