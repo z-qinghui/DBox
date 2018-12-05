@@ -1,77 +1,29 @@
 import React from 'react';
 import RcUpload from 'rc-upload';
 import UploadList from './uploadList';
-import getFileItem from './getFileItem';
 import classNames from 'classnames';
-const prefixCls = 'idoll-upload';
-
-function noop() {
-}
-
-function T() {
-  return true;
-}
-
-// Fix IE file.status problem
-// via coping a new Object
-function fileToObject(file) {
-  return {
-    lastModified: file.lastModified,
-    lastModifiedDate: file.lastModifiedDate,
-    name: file.filename || file.name,
-    size: file.size,
-    type: file.type,
-    uid: file.uid,
-    response: file.response,
-    error: file.error,
-    percent: 0,
-    originFileObj: file,
-  };
-}
-
-/**
- * 生成Progress percent: 0.1 -> 0.98
- *   - for ie
- */
-function genPercentAdd() {
-  let k = 0.1;
-  const i = 0.01;
-  const end = 0.98;
-  return function (s) {
-    let start = s;
-    if (start >= end) {
-      return start;
-    }
-
-    start += k;
-    k = k - i;
-    if (k < 0.001) {
-      k = 0.001;
-    }
-    return start * 100;
-  };
-}
+import LocaleReceiver from '../locale-provider/LocaleReceiver';
+import defaultLocale from '../locale-provider/zh_CN';
+import { T, fileToObject, genPercentAdd, getFileItem } from './utils';
+// const prefixCls = 'idoll-upload';
 
 function UploadDragger(props) {
   return <Upload {...props} type='drag' style={{ height: props.height }} />;
 }
 
-export default class Upload extends React.Component {
+ class Upload extends React.Component {
   static Dragger = UploadDragger;
 
   static defaultProps = {
-    prefixCls: prefixCls,
+    prefixCls: 'idoll-upload',
     type: 'select',
-    // do not set
-    // name: '',
     multiple: false,
     action: '',
     data: {},
     accept: '',
-    onChange: noop,
     beforeUpload: T,
     showUploadList: true,
-    listType: 'text', // or pictrue
+    listType: 'text',
     className: '',
     disabled: false,
   }
@@ -85,20 +37,17 @@ export default class Upload extends React.Component {
   }
 
   onStart = (file) => {
-    let targetItem;
-    let nextFileList = this.state.fileList.concat();
-    if (file.length > 0) {
-      targetItem = file.map(f => {
-        const fileObject = fileToObject(f);
-        fileObject.status = 'uploading';
-        return fileObject;
-      });
-      nextFileList = nextFileList.concat(targetItem);
-    } else {
-      targetItem = fileToObject(file);
-      targetItem.status = 'uploading';
+    let targetItem = fileToObject(file);
+    targetItem.status = 'uploading';
+    const nextFileList = this.state.fileList.concat();
+
+    const fileIndex = nextFileList.findIndex(({ uid }) => uid === targetItem.uid);
+    if (fileIndex === -1) {
       nextFileList.push(targetItem);
+    } else {
+      nextFileList[fileIndex] = targetItem;
     }
+
     this.onChange({
       file: targetItem,
       fileList: nextFileList,
@@ -115,20 +64,9 @@ export default class Upload extends React.Component {
     this.progressTimer = setInterval(() => {
       curPercent = getPercent(curPercent);
       this.onProgress({
-        percent: curPercent,
+        percent: curPercent * 100,
       }, file);
     }, 200);
-  }
-
-  removeFile(file) {
-    let fileList = this.state.fileList;
-    let targetItem = getFileItem(file, fileList);
-    let index = fileList.indexOf(targetItem);
-    if (index !== -1) {
-      fileList.splice(index, 1);
-      return fileList;
-    }
-    return null;
   }
 
   onSuccess = (response, file) => {
@@ -302,3 +240,5 @@ export default class Upload extends React.Component {
     );
   }
 }
+
+export default Upload;

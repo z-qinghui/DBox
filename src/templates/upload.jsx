@@ -5,7 +5,7 @@ import Upload from 'components/upload';
 import Icon from 'components/icon';
 
 const Dragger = Upload.Dragger;
-// 基础上传
+// 上传
 const props = {
   name: 'file',
   action: '/upload.do',
@@ -138,7 +138,7 @@ const Uploader = () => (
   <div id='main-container'>
     <h1 className='h1'>基础上传</h1>
     <Upload {...props}>
-      <Button type='ghost' icon='plus'>
+      <Button type='primary' icon='plus'>
         点击上传
       </Button>
     </Upload>
