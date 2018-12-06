@@ -5,7 +5,6 @@ import Progress from '../progress';
 import Tooltip from '../tooltip';
 import classNames from 'classnames';
 
-
 const imageTypes = ['image', 'webp', 'png', 'svg', 'gif', 'jpg', 'jpeg', 'bmp'];
 
 const previewFile = (file, callback) => {
@@ -51,6 +50,7 @@ export default class UploadList extends React.Component {
       strokeWidth: 3,
       showInfo: true,
     },
+    prefixCls: 'idoll-upload',
     showRemoveIcon: true,
     showPreviewIcon: true
   };
@@ -74,7 +74,7 @@ export default class UploadList extends React.Component {
     if (this.props.listType !== 'picture' && this.props.listType !== 'picture-card') {
       return;
     }
-    this.props.items.forEach(file => {
+    (this.props.items || []).forEach(file => {
       if (typeof document === 'undefined' ||
           typeof window === 'undefined' ||
           !window.FileReader || !window.File ||
@@ -95,8 +95,8 @@ export default class UploadList extends React.Component {
   }
 
   render() {
-    const {prefixCls, listType, showPreviewIcon, showRemoveIcon, locale} = this.props;
-    let list = this.props.items.map(file => {
+    const {prefixCls, items = [], listType, showPreviewIcon, showRemoveIcon, locale} = this.props;
+    let list = items.map(file => {
       let progress;
       let icon = <Icon type={file.status === 'uploading' ? 'loading' : 'paper-clip'} />;
 
@@ -123,6 +123,7 @@ export default class UploadList extends React.Component {
       }
 
       if (file.status === 'uploading') {
+        // show loading icon if upload progress listener is disabled
         const loadingProgress = ('percent' in file) ? (
           <Progress type='line' {...this.props.progressAttr} percent={file.percent} />
         ) : null;
@@ -212,9 +213,10 @@ export default class UploadList extends React.Component {
       [`${prefixCls}-list`]: true,
       [`${prefixCls}-list-${listType}`]: true,
     });
+    const animationDirection = listType === 'picture-card' ? 'animate-inline' : 'animate';
     return (
       <Animate
-        transitionName={`${prefixCls}-margin-top`}
+        transitionName={`${prefixCls}-${animationDirection}`}
         component='div'
         className={listClassNames}
         >

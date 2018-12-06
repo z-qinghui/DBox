@@ -1,11 +1,13 @@
 import React from 'react';
 import RcUpload from 'rc-upload';
 import UploadList from './uploadList';
+import uniqBy from 'lodash/uniqBy';
 import classNames from 'classnames';
 import LocaleReceiver from '../locale-provider/LocaleReceiver';
 import defaultLocale from '../locale-provider/zh_CN';
 import { T, fileToObject, genPercentAdd, getFileItem } from './utils';
-// const prefixCls = 'idoll-upload';
+
+const prefixCls = 'idoll-upload';
 
 function UploadDragger(props) {
   return <Upload {...props} type='drag' style={{ height: props.height }} />;
@@ -58,7 +60,7 @@ function UploadDragger(props) {
     }
   }
 
-  autoUpdateProgress(percent, file) {
+  autoUpdateProgress(file) {
     const getPercent = genPercentAdd();
     let curPercent = 0;
     this.progressTimer = setInterval(() => {
@@ -85,7 +87,7 @@ function UploadDragger(props) {
     targetItem.status = 'done';
     targetItem.response = response;
     this.onChange({
-      file: targetItem,
+      file: {...targetItem},
       fileList,
     });
   }
@@ -116,7 +118,10 @@ function UploadDragger(props) {
     targetItem.error = error;
     targetItem.response = response;
     targetItem.status = 'error';
-    this.handleRemove(targetItem);
+    this.onChange({
+      file: {...targetItem},
+      fileList,
+    })
   }
 
   handleRemove(file) {
@@ -162,53 +167,65 @@ function UploadDragger(props) {
     });
   }
 
+  beforeUpload = (file, fileList) => {
+    if (!this.props.beforeUpload) {
+      return true;
+    }
+    const result = this.props.beforeUpload(file, fileList);
+    if (result) {
+
+    }
+  }
+
   clearProgressTimer() {
     clearInterval(this.progressTimer);
   }
 
   render() {
-    let type = this.props.type || 'select';
-    let props = {
-      ...this.props,
+    const {prefixCls = '', className, showUploadList, listType, type, disabled, children} = this.props;
+    const rcUploadProps = {
       onStart: this.onStart,
       onError: this.onError,
       onProgress: this.onProgress,
       onSuccess: this.onSuccess,
-      beforeUpload: this.props.beforeUpload,
+      ...this.props,
+      beforeUpload: this.beforeUpload,
     };
-    let uploadList;
-    if (this.props.showUploadList) {
-      uploadList = (
-        <UploadList listType={this.props.listType}
-          items={this.state.fileList}
-          onPreview={props.onPreview}
-          onRemove={this.handleManualRemove}
-        />
-      );
-    }
+
+    delete rcUploadProps.className;
+
+    const uploadList = showUploadList ? (
+      <LocaleReceiver
+        componentName='Upload'
+        defaultLocale={defaultLocale.Upload}
+      >
+        {this.renderUploadList}
+      </LocaleReceiver>
+    ) : null;
+
     if (type === 'drag') {
-      const dragCls = classNames({
-        [prefixCls]: true,
-        [`${prefixCls}-drag`]: true,
-        [`${prefixCls}-drag-uploading`]: this.state.fileList.some(file => file.status === 'uploading'),
-        [`${prefixCls}-drag-hover`]: this.state.dragState === 'dragover',
-        [`${prefixCls}-disabled`]: this.props.disabled,
-      });
-      return (
-        <span className={this.props.className}>
-          <div className={dragCls}
-            onDrop={this.onFileDrop}
-            onDragOver={this.onFileDrop}
-            onDragLeave={this.onFileDrop}
-          >
-            <RcUpload {...props} ref='upload'>
-              <div className={`${prefixCls}-drag-container`}>
-                {this.props.children}
-              </div>
-            </RcUpload>
-          </div>
-          {uploadList}
-        </span>
+    const dragCls = classNames({
+      [prefixCls]: true,
+      [`${prefixCls}-drag`]: true,
+      [`${prefixCls}-drag-uploading`]: this.state.fileList.some(file => file.status === 'uploading'),
+      [`${prefixCls}-drag-hover`]: this.state.dragState === 'dragover',
+      [`${prefixCls}-disabled`]: this.props.disabled,
+    });
+    return (
+      <span className={className}>
+        <div className={dragCls}
+          onDrop={this.onFileDrop}
+          onDragOver={this.onFileDrop}
+          onDragLeave={this.onFileDrop}
+        >
+          <RcUpload {...props} ref='upload'>
+            <div className={`${prefixCls}-drag-container`}>
+              {children}
+            </div>
+          </RcUpload>
+        </div>
+        {uploadList}
+      </span>
       );
     }
 
