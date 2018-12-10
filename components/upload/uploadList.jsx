@@ -41,13 +41,12 @@ const isImageUrl = (file) => {
   }
   return true;
 }
-
 export default class UploadList extends React.Component {
   static defaultProps = {
     listType: 'text', // or picture
     items: [],
     progressAttr: {
-      strokeWidth: 3,
+      strokeWidth: 4,
       showInfo: true,
     },
     prefixCls: 'idoll-upload',
@@ -64,10 +63,11 @@ export default class UploadList extends React.Component {
 
   handlePreview = (file, e) => {
     const { onPreview } = this.props;
-    if (onPreview) {
-      e.preventDefault();
-      return onPreview(file);
+    if (!onPreview) {
+      return;
     }
+    e.preventDefault();
+    return onPreview(file);
   }
 
   componentDidUpdate() {
@@ -98,7 +98,7 @@ export default class UploadList extends React.Component {
     const {prefixCls, items = [], listType, showPreviewIcon, showRemoveIcon, locale} = this.props;
     let list = items.map(file => {
       let progress;
-      let icon = <Icon type={file.status === 'uploading' ? 'loading' : 'paper-clip'} />;
+      let icon = <Icon type={file.status === 'uploading' ? 'pro-sync' : 'pro-info'} />;
 
       if (listType === 'picture' || listType === 'picture-card') {
         if (listType === 'picture-card' && file.status === 'uploading') {
@@ -174,7 +174,7 @@ export default class UploadList extends React.Component {
           onClick={e => this.handlePreview(file, e)}
           title={locale.previewFile}
         >
-          <Icon type='eye-o' />
+          <Icon type='pro-info' />
         </a>
       ) : null;
 

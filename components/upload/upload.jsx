@@ -4,15 +4,12 @@ import UploadList from './uploadList';
 import uniqBy from 'lodash/uniqBy';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import UploadDragger from './dragger';
 import LocaleReceiver from '../locale-provider/LocaleReceiver';
 import defaultLocale from '../locale-provider/zh_CN';
 import { T, fileToObject, genPercentAdd, getFileItem } from './utils';
-import { runInThisContext } from 'vm';
 
-function UploadDragger(props) {
-  return <Upload {...props} type='drag' style={{ height: props.height }} />;
-}
-
+import './style';
  class Upload extends React.Component {
   static Dragger = UploadDragger;
 
@@ -36,7 +33,8 @@ function UploadDragger(props) {
     directory: PropTypes.bool,
     onChange: PropTypes.func,
     onPreview: PropTypes.func,
-    onRemove: PropTypes.func
+    onRemove: PropTypes.func,
+    status: PropTypes.oneOf(['error', 'success', 'done', 'uploading', 'removed'])
   }
 
   constructor(props) {
@@ -45,6 +43,10 @@ function UploadDragger(props) {
       fileList: this.props.fileList || this.props.defaultFileList || [],
       dragState: 'drop',
     };
+  }
+
+  componentWillUnmount() {
+    this.clearProgressTimer();
   }
 
   onStart = (file) => {
@@ -72,6 +74,7 @@ function UploadDragger(props) {
   autoUpdateProgress(file) {
     const getPercent = genPercentAdd();
     let curPercent = 0;
+    this.clearProgressTimer();
     this.progressTimer = setInterval(() => {
       curPercent = getPercent(curPercent);
       this.onProgress({
@@ -134,41 +137,41 @@ function UploadDragger(props) {
   }
 
   handleRemove(file) {
-    let fileList = this.removeFile(file);
-    if (fileList) {
-      this.onChange({
-        file,
-        fileList,
-      });
-    }
+    const { onRemove } = this.props;
+
+    Promise.resolve(typeof onRemove === 'function' ? onRemove(file) : onRemove).then(ret => {
+      // Prevent removing file
+      if (ret === false) {
+        return;
+      }
+
+     // const removedFileList = removeFileItem(file, this.state.fileList);
+      if (this.state.fileList) {
+        this.onChange({
+          file,
+          fileList: (file, this.state.fileList),
+        });
+      }
+    });
   }
 
   handleManualRemove = (file) => {
     this.refs.upload.abort(file);
-    /* eslint-disable */
-    file.status = 'removed';
-    /* eslint-enable */
-    if ('onRemove' in this.props) {
-      this.props.onRemove(file);
-    } else {
-      this.handleRemove(file);
-    }
-  }
+    file.status = 'removed'; // eslint-disable-line
+    this.handleRemove(file);
+  };
 
   onChange = (info) => {
     if (!('fileList' in this.props)) {
       this.setState({ fileList: info.fileList });
     }
-    this.props.onChange(info);
-  }
 
-  componentWillReceiveProps(nextProps) {
-    if ('fileList' in nextProps) {
-      this.setState({
-        fileList: nextProps.fileList || [],
-      });
+    const { onChange } = this.props;
+    if (onChange) {
+      onChange(info);
     }
-  }
+  };
+
 
   onFileDrop = (e) => {
     this.setState({
@@ -201,7 +204,7 @@ function UploadDragger(props) {
   }
 
   saveUpload = (node) => {
-    runInThisContext.upload = node
+    this.upload = node;
   }
 
   renderUploadList = (locale) => {

@@ -8,7 +8,7 @@ const Dragger = Upload.Dragger;
 // 上传
 const props = {
   name: 'file',
-  action: '/upload.do',
+  action: '//jsonplaceholder.typicode.com/posts/',
   headers: {
     authorization: 'authorization-text',
   },
@@ -43,6 +43,12 @@ const props1 = {
     name: 'yyy.png',
     status: 'done',
     url: 'http://www.baidu.com/yyy.png',
+  }, {
+    uid: '3',
+    name: 'zzz.png',
+    status: 'error',
+    response: 'Server Error 500',
+    url: 'http://www.baidu.com/zzz.png',
   }],
 };
 
@@ -132,7 +138,6 @@ const props3 = {
   listType: 'picture',
   defaultFileList: [...fileList],
 };
-
 
 const Uploader = () => (
   <div id='main-container'>
