@@ -2,11 +2,12 @@ const path = require('path');
 const { version } = require('./package.json')
 const {camelCase, upperFirst} = require('lodash');
 
+const PORT = parseInt(process.env.PORT || 9002, 10);
 
 
 module.exports = {
   title: `Dbox UI ${version}`,
-  serverPort: 9002,
+  serverPort: PORT,
   exampleMode: 'collapse',
   usageMode: 'hidden',
   ribbon: {
@@ -247,9 +248,9 @@ module.exports = {
         {
           name: 'Other',
           components: () => ([
-          path.resolve(__dirname, './components/back-top/index.jsx'),
-          path.resolve(__dirname, './components/anchor/index.jsx'),
-          path.resolve(__dirname, './components/divider/index.jsx'),
+            path.resolve(__dirname, './components/anchor/index.jsx'),
+            path.resolve(__dirname, './components/back-top/index.jsx'),
+            path.resolve(__dirname, './components/divider/index.jsx'),
           ])
         },
       ]

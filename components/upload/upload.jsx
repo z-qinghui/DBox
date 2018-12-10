@@ -2,12 +2,12 @@ import React from 'react';
 import RcUpload from 'rc-upload';
 import UploadList from './uploadList';
 import uniqBy from 'lodash/uniqBy';
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import LocaleReceiver from '../locale-provider/LocaleReceiver';
 import defaultLocale from '../locale-provider/zh_CN';
 import { T, fileToObject, genPercentAdd, getFileItem } from './utils';
-
-const prefixCls = 'idoll-upload';
+import { runInThisContext } from 'vm';
 
 function UploadDragger(props) {
   return <Upload {...props} type='drag' style={{ height: props.height }} />;
@@ -28,6 +28,15 @@ function UploadDragger(props) {
     listType: 'text',
     className: '',
     disabled: false,
+  }
+
+  static propTypes = {
+    accept: PropTypes.string,
+    action: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
+    directory: PropTypes.bool,
+    onChange: PropTypes.func,
+    onPreview: PropTypes.func,
+    onRemove: PropTypes.func
   }
 
   constructor(props) {
@@ -172,13 +181,43 @@ function UploadDragger(props) {
       return true;
     }
     const result = this.props.beforeUpload(file, fileList);
-    if (result) {
-
+    if (result === false) {
+      this.onChange({
+        file,
+        fileList: uniqBy(
+          this.state.fileList.concat(fileList.map(fileToObject)),
+          (item) => item.uid,
+        )
+      });
+      return false
+    } else if (result && result.then) {
+      return result;
     }
+    return true
   }
 
   clearProgressTimer() {
     clearInterval(this.progressTimer);
+  }
+
+  saveUpload = (node) => {
+    runInThisContext.upload = node
+  }
+
+  renderUploadList = (locale) => {
+    const {showUploadList, listType} = this.props;
+    const {showRemoveIcon, showPreviewIcon} = showUploadList;
+    return (
+      <UploadList
+        listType={listType}
+        items={this.state.fileList}
+        onPreview={showRemoveIcon}
+        onRemove={this.handleManualRemove}
+        showRemoveIcon={showRemoveIcon}
+        showPreviewIcon={showPreviewIcon}
+        locale={{...locale, ...this.props.locale}}
+      />
+    );
   }
 
   render() {
@@ -209,7 +248,7 @@ function UploadDragger(props) {
       [`${prefixCls}-drag`]: true,
       [`${prefixCls}-drag-uploading`]: this.state.fileList.some(file => file.status === 'uploading'),
       [`${prefixCls}-drag-hover`]: this.state.dragState === 'dragover',
-      [`${prefixCls}-disabled`]: this.props.disabled,
+      [`${prefixCls}-disabled`]: disabled,
     });
     return (
       <span className={className}>
@@ -218,7 +257,7 @@ function UploadDragger(props) {
           onDragOver={this.onFileDrop}
           onDragLeave={this.onFileDrop}
         >
-          <RcUpload {...props} ref='upload'>
+          <RcUpload {...rcUploadProps} ref='upload'>
             <div className={`${prefixCls}-drag-container`}>
               {children}
             </div>
@@ -232,12 +271,12 @@ function UploadDragger(props) {
     const uploadButtonCls = classNames({
       [prefixCls]: true,
       [`${prefixCls}-select`]: true,
-      [`${prefixCls}-select-${this.props.listType}`]: true,
-      [`${prefixCls}-disabled`]: this.props.disabled,
+      [`${prefixCls}-select-${listType}`]: true,
+      [`${prefixCls}-disabled`]: disabled,
     });
 
     const uploadButton = this.props.children
-      ? <div className={uploadButtonCls}><RcUpload {...props} ref='upload' /></div>
+      ? <div className={uploadButtonCls}><RcUpload {...rcUploadProps} ref='upload' /></div>
       : null;
 
     if (this.props.listType === 'picture-card') {
@@ -250,7 +289,7 @@ function UploadDragger(props) {
     }
 
     return (
-      <span className={this.props.className}>
+      <span className={className}>
         {uploadButton}
         {uploadList}
       </span>
