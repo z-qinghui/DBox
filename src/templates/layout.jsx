@@ -23,10 +23,11 @@ class MainLayout extends Component {
   constructor(props) {
     super(props)
     const panes = [
-      { title: <Icon type='home' />, content: '首页', key: '7' }
+      { title: <Icon type='home' />, content: '首页', key: '27' }
     ];
     this.state = {
       openKeys: ['sub1'],
+      openKeys2: ['item_1'],
       flag: false,
       flag2: false,
       current: 'platform',
@@ -85,14 +86,140 @@ class MainLayout extends Component {
       });
     }
   }
+  onOpenChange2 = (value) => {
+    const latestOpenKey = value.find(key => this.state.openKeys2.indexOf(key) === -1);
+    if (this.rootSubmenuKeys.indexOf(latestOpenKey) === -1) {
+      this.setState({ openKeys2: value });
+    } else {
+      this.setState({
+        openKeys2: latestOpenKey ? [latestOpenKey] : [],
+      });
+    }
+  }
   onEdit = (targetKey, action) => {
     this[action](targetKey);
   }
-  add = (key, title, e) => {
+  add = (key, title) => {
     const panes = this.state.panes;
     const activeKey = key;
     panes.push({ title: title, content: title, key: activeKey });
     this.setState({panes, activeKey});
+  }
+  inlineMenu2 = () => {
+    if (this.state.flag2) {
+      return <Menu
+        onClick={this.handleClickBread}
+        defaultSelectedKeys={['8']}
+        mode={this.state.modeMenu2}
+>
+        <Menu.Item key='7'><div><Icon type='home' /><span>首页</span></div></Menu.Item>
+        <SubMenu key='item_1' title={<div><Icon type='platform' /><span>工作台</span></div>}>
+          <Menu.Item key='8'>子菜单一</Menu.Item>
+          <Menu.Item key='9'>子菜单二</Menu.Item>
+          <Menu.Item key='10'>子菜单三</Menu.Item>
+          <Menu.Item key='11'>子菜单四</Menu.Item>
+        </SubMenu>
+        <SubMenu key='item_2' title={<div><Icon type='bars' /><span>订单中心</span></div>}>
+          <Menu.Item key='12'>子菜单五</Menu.Item>
+          <Menu.Item key='13'>子菜单六</Menu.Item>
+          <Menu.Item key='14'>子菜单七</Menu.Item>
+          <Menu.Item key='15'>子菜单八</Menu.Item>
+        </SubMenu>
+        <SubMenu key='item_3' title={<div><Icon type='tool' /><span>配置管理</span></div>}>
+          <Menu.Item key='16'>子菜单九</Menu.Item>
+          <Menu.Item key='17'>子菜单十</Menu.Item>
+          <Menu.Item key='18'>子菜单十一</Menu.Item>
+          <Menu.Item key='19'>子菜单十二</Menu.Item>
+        </SubMenu>
+      </Menu>
+    } else {
+      return <Menu
+        onClick={this.handleClickBread}
+        defaultSelectedKeys={['8']}
+        openKeys={this.state.openKeys2}
+        onOpenChange={this.onOpenChange2}
+        mode={this.state.modeMenu2}
+>
+        <Menu.Item key='7'><div><Icon type='home' /><span>首页</span></div></Menu.Item>
+        <SubMenu key='item_1' title={<div><Icon type='platform' /><span>工作台</span></div>}>
+          <Menu.Item key='8'>子菜单一</Menu.Item>
+          <Menu.Item key='9'>子菜单二</Menu.Item>
+          <Menu.Item key='10'>子菜单三</Menu.Item>
+          <Menu.Item key='11'>子菜单四</Menu.Item>
+        </SubMenu>
+        <SubMenu key='item_2' title={<div><Icon type='bars' /><span>订单中心</span></div>}>
+          <Menu.Item key='12'>子菜单五</Menu.Item>
+          <Menu.Item key='13'>子菜单六</Menu.Item>
+          <Menu.Item key='14'>子菜单七</Menu.Item>
+          <Menu.Item key='15'>子菜单八</Menu.Item>
+        </SubMenu>
+        <SubMenu key='item_3' title={<div><Icon type='tool' /><span>配置管理</span></div>}>
+          <Menu.Item key='16'>子菜单九</Menu.Item>
+          <Menu.Item key='17'>子菜单十</Menu.Item>
+          <Menu.Item key='18'>子菜单十一</Menu.Item>
+          <Menu.Item key='19'>子菜单十二</Menu.Item>
+        </SubMenu>
+      </Menu>
+    }
+  }
+  inlineMenu = () => {
+    if (this.state.flag) {
+      return <Menu
+        onClick={this.handleClickTabs}
+        defaultSelectedKeys={['27']}
+        selectedKeys={[this.state.activeKey]}
+        mode={this.state.modeMenu}
+>
+        <Menu.Item title='首页' key='27'><div><Icon type='home' /><span>首页</span></div></Menu.Item>
+        <SubMenu key='sub1' title={<div><Icon type='platform' /><span>工作台</span></div>}>
+          <Menu.Item title='子菜单一' key='28'>子菜单一</Menu.Item>
+          <Menu.Item title='子菜单二' key='29'>子菜单二</Menu.Item>
+          <Menu.Item title='子菜单三' key='30'>子菜单三</Menu.Item>
+          <Menu.Item title='子菜单四' key='31'>子菜单四</Menu.Item>
+        </SubMenu>
+        <SubMenu key='sub2' title={<div><Icon type='bars' /><span>订单中心</span></div>}>
+          <Menu.Item title='子菜单五' key='32'>子菜单五</Menu.Item>
+          <Menu.Item title='子菜单六' key='33'>子菜单六</Menu.Item>
+          <Menu.Item title='子菜单七' key='34'>子菜单七</Menu.Item>
+          <Menu.Item title='子菜单八' key='35'>子菜单八</Menu.Item>
+        </SubMenu>
+        <SubMenu key='sub3' title={<div><Icon type='tool' /><span>配置管理</span></div>}>
+          <Menu.Item title='子菜单九' key='36'>子菜单九</Menu.Item>
+          <Menu.Item title='子菜单十' key='37'>子菜单十</Menu.Item>
+          <Menu.Item title='子菜单十一' key='38'>子菜单十一</Menu.Item>
+          <Menu.Item title='子菜单十二' key='39'>子菜单十二</Menu.Item>
+        </SubMenu>
+      </Menu>
+    } else {
+      return <Menu
+        onClick={this.handleClickTabs}
+        defaultSelectedKeys={['27']}
+        selectedKeys={[this.state.activeKey]}
+        openKeys={this.state.openKeys}
+        onOpenChange={this.onOpenChange}
+        mode={this.state.modeMenu}
+>
+        <Menu.Item title='首页' key='27'><div><Icon type='home' /><span>首页</span></div></Menu.Item>
+        <SubMenu key='sub1' title={<div><Icon type='platform' /><span>工作台</span></div>}>
+          <Menu.Item title='子菜单一' key='28'>子菜单一</Menu.Item>
+          <Menu.Item title='子菜单二' key='29'>子菜单二</Menu.Item>
+          <Menu.Item title='子菜单三' key='30'>子菜单三</Menu.Item>
+          <Menu.Item title='子菜单四' key='31'>子菜单四</Menu.Item>
+        </SubMenu>
+        <SubMenu key='sub2' title={<div><Icon type='bars' /><span>订单中心</span></div>}>
+          <Menu.Item title='子菜单五' key='32'>子菜单五</Menu.Item>
+          <Menu.Item title='子菜单六' key='33'>子菜单六</Menu.Item>
+          <Menu.Item title='子菜单七' key='34'>子菜单七</Menu.Item>
+          <Menu.Item title='子菜单八' key='35'>子菜单八</Menu.Item>
+        </SubMenu>
+        <SubMenu key='sub3' title={<div><Icon type='tool' /><span>配置管理</span></div>}>
+          <Menu.Item title='子菜单九' key='36'>子菜单九</Menu.Item>
+          <Menu.Item title='子菜单十' key='37'>子菜单十</Menu.Item>
+          <Menu.Item title='子菜单十一' key='38'>子菜单十一</Menu.Item>
+          <Menu.Item title='子菜单十二' key='39'>子菜单十二</Menu.Item>
+        </SubMenu>
+      </Menu>
+    }
   }
   remove = (targetKey) => {
     let activeKey = this.state.activeKey;
@@ -184,33 +311,7 @@ class MainLayout extends Component {
           <Layout>
             <Sider >
               <div className={this.state.flag2 ? 'miniLogo' : 'logo'}><div>LOGO</div></div>
-              <Menu
-                onClick={this.handleClickBread}
-                defaultSelectedKeys={['8']}
-                openKeys={this.state.openKeys}
-                onOpenChange={this.onOpenChange}
-                mode={this.state.modeMenu2}
-        >
-                <Menu.Item key='7'><div><Icon type='home' /><span>首页</span></div></Menu.Item>
-                <SubMenu key='item_1' title={<div><Icon type='platform' /><span>工作台</span></div>}>
-                  <Menu.Item key='8'>子菜单一</Menu.Item>
-                  <Menu.Item key='9'>子菜单二</Menu.Item>
-                  <Menu.Item key='10'>子菜单三</Menu.Item>
-                  <Menu.Item key='11'>子菜单四</Menu.Item>
-                </SubMenu>
-                <SubMenu key='item_2' title={<div><Icon type='bars' /><span>订单中心</span></div>}>
-                  <Menu.Item key='12'>子菜单五</Menu.Item>
-                  <Menu.Item key='13'>子菜单六</Menu.Item>
-                  <Menu.Item key='14'>子菜单七</Menu.Item>
-                  <Menu.Item key='15'>子菜单八</Menu.Item>
-                </SubMenu>
-                <SubMenu key='item_3' title={<div><Icon type='tool' /><span>配置管理</span></div>}>
-                  <Menu.Item key='16'>子菜单九</Menu.Item>
-                  <Menu.Item key='17'>子菜单十</Menu.Item>
-                  <Menu.Item key='18'>子菜单十一</Menu.Item>
-                  <Menu.Item key='19'>子菜单十二</Menu.Item>
-                </SubMenu>
-              </Menu>
+              {this.inlineMenu2()}
               <Icon type={this.state.flag2 ? 'right-circle-o' : 'left-circle-o'} onClick={this.changeModel2} />
             </Sider>
             <Layout>
@@ -237,34 +338,7 @@ class MainLayout extends Component {
           <Layout>
             <Sider >
               <div className={this.state.flag ? 'miniLogo' : 'logo'}><div>LOGO</div></div>
-              <Menu
-                onClick={this.handleClickTabs}
-                defaultSelectedKeys={['7']}
-                selectedKeys={[this.state.activeKey]}
-                openKeys={this.state.openKeys}
-                onOpenChange={this.onOpenChange}
-                mode={this.state.modeMenu}
-        >
-                <Menu.Item title='首页' key='7'><div><Icon type='home' /><span>首页</span></div></Menu.Item>
-                <SubMenu key='sub1' title={<div><Icon type='platform' /><span>工作台</span></div>}>
-                  <Menu.Item title='子菜单一' key='8'>子菜单一</Menu.Item>
-                  <Menu.Item title='子菜单二' key='9'>子菜单二</Menu.Item>
-                  <Menu.Item title='子菜单三' key='10'>子菜单三</Menu.Item>
-                  <Menu.Item title='子菜单四' key='11'>子菜单四</Menu.Item>
-                </SubMenu>
-                <SubMenu key='sub2' title={<div><Icon type='bars' /><span>订单中心</span></div>}>
-                  <Menu.Item title='子菜单五' key='12'>子菜单五</Menu.Item>
-                  <Menu.Item title='子菜单六' key='13'>子菜单六</Menu.Item>
-                  <Menu.Item title='子菜单七' key='14'>子菜单七</Menu.Item>
-                  <Menu.Item title='子菜单八' key='15'>子菜单八</Menu.Item>
-                </SubMenu>
-                <SubMenu key='sub3' title={<div><Icon type='tool' /><span>配置管理</span></div>}>
-                  <Menu.Item title='子菜单九' key='16'>子菜单九</Menu.Item>
-                  <Menu.Item title='子菜单十' key='17'>子菜单十</Menu.Item>
-                  <Menu.Item title='子菜单十一' key='18'>子菜单十一</Menu.Item>
-                  <Menu.Item title='子菜单十二' key='19'>子菜单十二</Menu.Item>
-                </SubMenu>
-              </Menu>
+              {this.inlineMenu()}
               <Icon type={this.state.flag ? 'right-circle-o' : 'left-circle-o'} onClick={this.changeModel} />
             </Sider>
             <Layout>
@@ -277,7 +351,7 @@ class MainLayout extends Component {
               </Header>
               <Content>
                 <Tabs hideAdd onChange={this.onChange} activeKey={this.state.activeKey} type='editable-card' onEdit={this.onEdit}>
-                  {this.state.panes.map(pane => <TabPane closable={pane.key === '7' ? false : 'true'} tab={pane.title} key={pane.key}>{pane.content}</TabPane>)}
+                  {this.state.panes.map(pane => <TabPane closable={pane.key === '27' ? false : 'true'} tab={pane.title} key={pane.key}>{pane.content}</TabPane>)}
                 </Tabs>
               </Content>
             </Layout>
